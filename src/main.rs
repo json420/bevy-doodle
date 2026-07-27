@@ -6,6 +6,18 @@ struct Position {
     y: f32,
 }
 
+#[derive(Component)]
+struct Person;
+
+#[derive(Component)]
+struct Name(String);
+
+fn add_people(mut commands: Commands) {
+    commands.spawn((Person, Name("Joan".to_string())));
+    commands.spawn((Person, Name("Tina".to_string())));
+    commands.spawn((Person, Name("Fred".to_string())));
+}
+
 struct Entity(u64);
 
 fn print_position_system(query: Query<&Position>) {
@@ -18,6 +30,15 @@ fn hello_world() {
     println!("hello, world.");
 }
 
+fn greet_people(query: Query<&Name, With<Person>>) {
+    for name in &query {
+        println!("hello {}!", name.0);
+    }
+}
+
 fn main() {
-    App::new().add_systems(Update, hello_world).run();
+    App::new()
+        .add_systems(Startup, add_people)
+        .add_systems(Update, (hello_world, greet_people))
+        .run();
 }
