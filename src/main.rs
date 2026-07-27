@@ -18,6 +18,15 @@ fn add_people(mut commands: Commands) {
     commands.spawn((Person, Name("Fred".to_string())));
 }
 
+fn update_people(mut query: Query<&mut Name, With<Person>>) {
+    for mut name in &mut query {
+        if name.0 == "Tina" {
+            name.0 = "Sue".to_string();
+            break;
+        }
+    }
+}
+
 struct Entity(u64);
 
 fn print_position_system(query: Query<&Position>) {
@@ -39,6 +48,12 @@ fn greet_people(query: Query<&Name, With<Person>>) {
 fn main() {
     App::new()
         .add_systems(Startup, add_people)
-        .add_systems(Update, (hello_world, greet_people))
+        .add_systems(
+            Update,
+            (
+                hello_world,
+                (greet_people, update_people, greet_people).chain(),
+            ),
+        )
         .run();
 }
