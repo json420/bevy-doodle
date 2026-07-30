@@ -95,7 +95,8 @@ fn setup_sensei(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn rotate_sensei(time: Res<Time>, mut sprite: Single<&mut Transform, With<Sprite>>) {
-    sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * 0.5);
+    sprite.rotation *=
+        Quat::from_rotation_z(time.delta_secs() * 0.5) * Quat::from_rotation_y(time.delta_secs());
 }
 
 fn main() {
