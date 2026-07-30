@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    window::{PresentMode, WindowPlugin},
+};
 
 #[derive(Component)]
 struct Person;
@@ -44,7 +47,13 @@ impl Plugin for HelloPlugin {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                present_mode: PresentMode::AutoVsync,
+                ..Default::default()
+            }),
+            ..Default::default()
+        }))
         .add_plugins(HelloPlugin)
         .run();
 }
