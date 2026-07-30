@@ -1,4 +1,5 @@
 use bevy::{
+    camera::visibility::RenderLayers,
     prelude::*,
     window::{PresentMode, WindowPlugin},
 };
@@ -45,6 +46,20 @@ impl Plugin for HelloPlugin {
     }
 }
 
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    println!("setup");
+    commands.spawn((Camera2d, IsDefaultUiCamera));
+    commands.spawn((
+        Camera2d,
+        Camera {
+            order: 1,
+            clear_color: ClearColorConfig::None,
+            ..Default::default()
+        },
+        RenderLayers::layer(1),
+    ));
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -55,5 +70,6 @@ fn main() {
             ..Default::default()
         }))
         .add_plugins(HelloPlugin)
+        .add_systems(Startup, setup)
         .run();
 }
