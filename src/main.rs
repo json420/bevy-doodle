@@ -83,6 +83,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             BorderColor::all(Color::WHITE),
         )],
     ));
+
+    commands.spawn((
+        Sprite {
+            image: asset_server.load("textures/rpg/chars/sensei/sensei.png"),
+            custom_size: Some(Vec2::new(100.0, 100.0)),
+            ..Default::default()
+        },
+        RenderLayers::layer(1),
+    ));
 }
 
 fn main() {
