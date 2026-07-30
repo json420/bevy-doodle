@@ -47,7 +47,7 @@ impl Plugin for HelloPlugin {
     }
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup_sensei(mut commands: Commands, asset_server: Res<AssetServer>) {
     println!("setup");
     commands.spawn((Camera2d, IsDefaultUiCamera));
     commands.spawn((
@@ -94,6 +94,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
+fn rotate_sensei(time: Res<Time>, mut sprite: Single<&mut Transform, With<Sprite>>) {
+    sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * 0.5);
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -104,6 +108,7 @@ fn main() {
             ..Default::default()
         }))
         .add_plugins(HelloPlugin)
-        .add_systems(Startup, setup)
+        .add_systems(Startup, setup_sensei)
+        .add_systems(Update, rotate_sensei)
         .run();
 }
