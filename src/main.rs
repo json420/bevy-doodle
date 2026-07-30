@@ -1,5 +1,6 @@
 use bevy::{
     camera::visibility::RenderLayers,
+    color::palettes::tailwind,
     prelude::*,
     window::{PresentMode, WindowPlugin},
 };
@@ -57,6 +58,18 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..Default::default()
         },
         RenderLayers::layer(1),
+    ));
+
+    commands.spawn((
+        Node {
+            width: percent(100),
+            height: percent(100),
+            display: Display::Flex,
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            ..Default::default()
+        },
+        BackgroundColor(tailwind::ROSE_400.into()),
     ));
 }
 
