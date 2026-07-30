@@ -70,6 +70,18 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..Default::default()
         },
         BackgroundColor(tailwind::ROSE_400.into()),
+        children![(
+            Node {
+                height: percent(30),
+                width: percent(20),
+                min_height: px(150),
+                min_width: px(150),
+                border: UiRect::all(px(2)),
+                border_radius: BorderRadius::all(percent(25)),
+                ..Default::default()
+            },
+            BorderColor::all(Color::WHITE),
+        )],
     ));
 }
 
