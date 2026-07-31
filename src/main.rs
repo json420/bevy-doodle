@@ -94,9 +94,16 @@ fn setup_sensei(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-fn rotate_sensei(time: Res<Time>, mut sprite: Single<&mut Transform, With<Sprite>>) {
-    sprite.rotation *=
-        Quat::from_rotation_z(time.delta_secs() * -0.5) * Quat::from_rotation_y(time.delta_secs());
+#[derive(Resource, Deref, DerefMut)]
+struct AngularVelocityZ(f32);
+
+// So how does App.add_systems() know *which* sprite to call rotate_sensei() with?
+fn rotate_sensei(
+    time: Res<Time>,
+    mut sprite: Single<&mut Transform, With<Sprite>>,
+    avz: Res<AngularVelocityZ>,
+) {
+    sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * avz.0);
 }
 
 fn keypress_event(mut commands: Commands, keyboard: Res<ButtonInput<KeyCode>>) {
@@ -115,6 +122,7 @@ fn main() {
             ..Default::default()
         }))
         .add_plugins(HelloPlugin)
+        .insert_resource(AngularVelocityZ(0.5))
         .add_systems(Startup, setup_sensei)
         .add_systems(Update, rotate_sensei)
         .add_systems(Update, keypress_event)
