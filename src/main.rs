@@ -100,7 +100,9 @@ fn rotate_sensei(time: Res<Time>, mut sprite: Single<&mut Transform, With<Sprite
 }
 
 fn keypress_event(mut commands: Commands, keyboard: Res<ButtonInput<KeyCode>>) {
-    println!("keypress");
+    if keyboard.just_pressed(KeyCode::Digit1) {
+        println!("1");
+    }
 }
 
 fn main() {
