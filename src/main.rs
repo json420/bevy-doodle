@@ -106,9 +106,26 @@ fn rotate_sensei(
     sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * avz.0);
 }
 
-fn keypress_event(mut commands: Commands, keyboard: Res<ButtonInput<KeyCode>>) {
+fn keypress_event(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut avz: ResMut<AngularVelocityZ>,
+) {
     if keyboard.just_pressed(KeyCode::Digit1) {
         println!("1");
+        avz.0 = 1.2;
+    } else if keyboard.just_pressed(KeyCode::Digit2) {
+        println!("2");
+        avz.0 = 0.5;
+    } else if keyboard.just_pressed(KeyCode::Digit3) {
+        println!("3");
+        avz.0 = 0.0;
+    } else if keyboard.just_pressed(KeyCode::Digit4) {
+        println!("4");
+        avz.0 = -0.5;
+    } else if keyboard.just_pressed(KeyCode::Digit5) {
+        println!("5");
+        avz.0 = -1.2;
     }
 }
 
@@ -122,7 +139,7 @@ fn main() {
             ..Default::default()
         }))
         .add_plugins(HelloPlugin)
-        .insert_resource(AngularVelocityZ(0.5))
+        .insert_resource(AngularVelocityZ(0.0))
         .add_systems(Startup, setup_sensei)
         .add_systems(Update, rotate_sensei)
         .add_systems(Update, keypress_event)
