@@ -99,6 +99,10 @@ fn rotate_sensei(time: Res<Time>, mut sprite: Single<&mut Transform, With<Sprite
         Quat::from_rotation_z(time.delta_secs() * -0.5) * Quat::from_rotation_y(time.delta_secs());
 }
 
+fn keypress_event(mut commands: Commands, keyboard: Res<ButtonInput<KeyCode>>) {
+    println!("keypress");
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -111,5 +115,6 @@ fn main() {
         .add_plugins(HelloPlugin)
         .add_systems(Startup, setup_sensei)
         .add_systems(Update, rotate_sensei)
+        .add_systems(Update, keypress_event)
         .run();
 }
