@@ -141,6 +141,6 @@ fn main() {
         .add_plugins(HelloPlugin)
         .insert_resource(AngularVelocityZ(0.0))
         .add_systems(Startup, setup_sensei)
-        .add_systems(Update, (rotate_sensei, keypress_event))
+        .add_systems(Update, (keypress_event, rotate_sensei).chain())
         .run();
 }
