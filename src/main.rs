@@ -10,12 +10,14 @@ const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, -50.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(0.5, -0.5);
 const ORB_DIAMETER: f32 = 30.0;
 
-fn spawn_orb(
+fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    asset_server: Res<AssetServer>,
 ) {
-    println!("spawn_orb");
+    println!("setup()");
+    commands.spawn(Camera2d);
     commands.spawn((
         Mesh2d(meshes.add(Circle::default())),
         MeshMaterial2d(materials.add(ORB_COLOR)),
@@ -23,53 +25,6 @@ fn spawn_orb(
             .with_scale(Vec2::splat(ORB_DIAMETER).extend(1.0)),
         Orb,
         Velocity(ORB_INITIAL_VELOCITY),
-    ));
-}
-
-fn setup_sensei(mut commands: Commands, asset_server: Res<AssetServer>) {
-    println!("setup");
-    commands.spawn((Camera2d, IsDefaultUiCamera));
-    commands.spawn((
-        Camera2d,
-        Camera {
-            order: 1,
-            clear_color: ClearColorConfig::None,
-            ..Default::default()
-        },
-        RenderLayers::layer(1),
-    ));
-
-    commands.spawn((
-        Node {
-            width: percent(100),
-            height: percent(100),
-            display: Display::Flex,
-            justify_content: JustifyContent::Center,
-            align_items: AlignItems::Center,
-            ..Default::default()
-        },
-        BackgroundColor(tailwind::ROSE_400.into()),
-        children![(
-            Node {
-                height: percent(30),
-                width: percent(20),
-                min_height: px(150),
-                min_width: px(150),
-                border: UiRect::all(px(2)),
-                border_radius: BorderRadius::all(percent(25)),
-                ..Default::default()
-            },
-            BorderColor::all(Color::WHITE),
-        )],
-    ));
-
-    commands.spawn((
-        Sprite {
-            image: asset_server.load("textures/rpg/chars/sensei/sensei.png"),
-            custom_size: Some(Vec2::new(100.0, 100.0)),
-            ..Default::default()
-        },
-        RenderLayers::layer(1),
     ));
 }
 
@@ -85,22 +40,10 @@ struct Orb;
 fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>) {
     for (mut transform, velocity) in &mut query {
         let elapsed = time.delta_secs();
-        println!("{elapsed}");
         transform.translation.x += velocity.x * elapsed;
         transform.translation.y += velocity.y * elapsed;
+        //println!("{elapsed} {:?}", transform.translation);
     }
-}
-
-// So how does App.add_systems() know *which* sprite to call rotate_sensei() with?
-fn rotate_sensei(
-    time: Res<Time>,
-    mut sprite: Single<&mut Transform, With<Sprite>>,
-    avz: Res<AngularVelocityZ>,
-) {
-    sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * avz.0);
-    sprite.translation.x = avz.0 * 10.0;
-    //sprite.translation = Vec3::new(0.0, 0.0, 0.0);
-    //println!("{:?}", sprite.translation);
 }
 
 fn keypress_event(
@@ -136,11 +79,10 @@ fn main() {
             ..Default::default()
         }))
         .insert_resource(AngularVelocityZ(0.0))
-        .add_systems(Startup, setup_sensei)
-        .add_systems(Startup, spawn_orb)
+        .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (keypress_event, rotate_sensei, apply_velocity).chain(),
+            (keypress_event, apply_velocity).chain(),
         )
         .run();
 }
