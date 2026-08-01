@@ -47,6 +47,27 @@ impl Plugin for HelloPlugin {
     }
 }
 
+const ORB_COLOR: Color = Color::srgb(0.8, 0.1, 0.1);
+const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, -50.0, 2.0);
+const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(0.5, -0.5);
+const ORB_DIAMETER: f32 = 30.0;
+
+fn spawn_orb(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    println!("spawn_orb");
+    commands.spawn((
+        Mesh2d(meshes.add(Circle::default())),
+        MeshMaterial2d(materials.add(ORB_COLOR)),
+        Transform::from_translation(ORB_INITIAL_POSITION)
+            .with_scale(Vec2::splat(ORB_DIAMETER).extend(1.0)),
+        Orb,
+        Velocity(ORB_INITIAL_VELOCITY),
+    ));
+}
+
 fn setup_sensei(mut commands: Commands, asset_server: Res<AssetServer>) {
     println!("setup");
     commands.spawn((Camera2d, IsDefaultUiCamera));
@@ -97,6 +118,21 @@ fn setup_sensei(mut commands: Commands, asset_server: Res<AssetServer>) {
 #[derive(Resource, Deref, DerefMut)]
 struct AngularVelocityZ(f32);
 
+#[derive(Component, Deref, DerefMut)]
+struct Velocity(Vec2);
+
+#[derive(Component)]
+struct Orb;
+
+fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>) {
+    for (mut transform, velocity) in &mut query {
+        let elapsed = time.delta_secs();
+        println!("{elapsed}");
+        transform.translation.x += velocity.x * elapsed;
+        transform.translation.y += velocity.y * elapsed;
+    }
+}
+
 // So how does App.add_systems() know *which* sprite to call rotate_sensei() with?
 fn rotate_sensei(
     time: Res<Time>,
@@ -105,6 +141,8 @@ fn rotate_sensei(
 ) {
     sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * avz.0);
     sprite.translation.x = avz.0 * 10.0;
+    //sprite.translation = Vec3::new(0.0, 0.0, 0.0);
+    //println!("{:?}", sprite.translation);
 }
 
 fn keypress_event(
@@ -142,6 +180,10 @@ fn main() {
         .add_plugins(HelloPlugin)
         .insert_resource(AngularVelocityZ(0.0))
         .add_systems(Startup, setup_sensei)
-        .add_systems(Update, (keypress_event, rotate_sensei).chain())
+        .add_systems(Startup, spawn_orb)
+        .add_systems(
+            Update,
+            (keypress_event, rotate_sensei, apply_velocity).chain(),
+        )
         .run();
 }
