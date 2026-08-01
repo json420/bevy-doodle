@@ -7,7 +7,7 @@ use bevy::{
 
 const ORB_COLOR: Color = Color::srgb(0.8, 0.1, 0.1);
 const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, -50.0, 2.0);
-const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(0.5, -0.5);
+const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
 
 fn setup(
@@ -42,7 +42,7 @@ fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>
         let elapsed = time.delta_secs();
         transform.translation.x += velocity.x * elapsed;
         transform.translation.y += velocity.y * elapsed;
-        //println!("{elapsed} {:?}", transform.translation);
+        println!("{elapsed} {:?}", transform.translation);
     }
 }
 
