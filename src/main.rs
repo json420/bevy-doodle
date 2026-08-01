@@ -104,6 +104,7 @@ fn rotate_sensei(
     avz: Res<AngularVelocityZ>,
 ) {
     sprite.rotation *= Quat::from_rotation_z(time.delta_secs() * avz.0);
+    sprite.translation.x = avz.0 * 10.0;
 }
 
 fn keypress_event(
