@@ -45,9 +45,8 @@ fn apply_velocity(
 ) {
     for (mut transform, mut velocity) in &mut query {
         let elapsed = time.delta_secs();
-        transform.translation.x += velocity.x * elapsed;
-        transform.translation.y += velocity.y * elapsed;
-        //println!("{elapsed} {:?}", transform.translation);
+        transform.translation.x += current_velocity.x * elapsed;
+        transform.translation.y += current_velocity.y * elapsed;
     }
 }
 
@@ -65,16 +64,17 @@ fn keypress_event(
         vx += 1.0;
     }
     if keyboard.pressed(KeyCode::KeyW) {
-        vy -= 1.0;
-    }
-    if keyboard.pressed(KeyCode::KeyS) {
         vy += 1.0;
     }
-
-    current_velocity.0 = Vec2::new(vx, vy).normalize() * ORB_SPEED;
-    if vx != 0.0 || vy != 0.0 {
-        println!("{:?}", current_velocity.0);
+    if keyboard.pressed(KeyCode::KeyS) {
+        vy -= 1.0;
     }
+
+    current_velocity.0 = if vx != 0.0 || vy != 0.0 {
+        Vec2::new(vx, vy).normalize() * ORB_SPEED
+    } else {
+        Vec2::new(0.0, 0.0)
+    };
 }
 
 fn main() {
