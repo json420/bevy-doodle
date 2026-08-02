@@ -9,6 +9,7 @@ const ORB_COLOR: Color = Color::srgb(0.8, 0.1, 0.1);
 const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, -50.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
+const ORB_SPEED: f32 = 50.0;
 
 fn setup(
     mut commands: Commands,
@@ -29,7 +30,7 @@ fn setup(
 }
 
 #[derive(Resource, Deref, DerefMut)]
-struct AngularVelocityZ(f32);
+struct CurrentVelocity(Vec2);
 
 #[derive(Component, Deref, DerefMut)]
 struct Velocity(Vec2);
@@ -37,8 +38,12 @@ struct Velocity(Vec2);
 #[derive(Component)]
 struct Orb;
 
-fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>) {
-    for (mut transform, velocity) in &mut query {
+fn apply_velocity(
+    mut query: Query<(&mut Transform, &Velocity)>,
+    time: Res<Time>,
+    current_velocity: Res<CurrentVelocity>,
+) {
+    for (mut transform, mut velocity) in &mut query {
         let elapsed = time.delta_secs();
         transform.translation.x += velocity.x * elapsed;
         transform.translation.y += velocity.y * elapsed;
@@ -47,9 +52,8 @@ fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>
 }
 
 fn keypress_event(
-    mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
-    mut avz: ResMut<AngularVelocityZ>,
+    mut current_velocity: ResMut<CurrentVelocity>,
 ) {
     let mut vx = 0.0;
     let mut vy = 0.0;
@@ -67,26 +71,9 @@ fn keypress_event(
         vy += 1.0;
     }
 
-    let v = Vec2::new(vx, vy);
+    current_velocity.0 = Vec2::new(vx, vy).normalize() * ORB_SPEED;
     if vx != 0.0 || vy != 0.0 {
-        println!("{:?}", v);
-    }
-
-    if keyboard.just_pressed(KeyCode::Digit1) {
-        println!("1");
-        avz.0 = 1.2;
-    } else if keyboard.just_pressed(KeyCode::Digit2) {
-        println!("2");
-        avz.0 = 0.5;
-    } else if keyboard.just_pressed(KeyCode::Digit3) {
-        println!("3");
-        avz.0 = 0.0;
-    } else if keyboard.just_pressed(KeyCode::Digit4) {
-        println!("4");
-        avz.0 = -0.5;
-    } else if keyboard.just_pressed(KeyCode::Digit5) {
-        println!("5");
-        avz.0 = -1.2;
+        println!("{:?}", current_velocity.0);
     }
 }
 
@@ -99,7 +86,7 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .insert_resource(AngularVelocityZ(0.0))
+        .insert_resource(CurrentVelocity(Vec2::new(0.0, 0.0)))
         .add_systems(Startup, setup)
         .add_systems(Update, (keypress_event, apply_velocity).chain())
         .run();
