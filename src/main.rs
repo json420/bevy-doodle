@@ -9,7 +9,7 @@ const ORB_COLOR: Color = Color::srgb(0.8, 0.1, 0.1);
 const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, -50.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
-const ORB_SPEED: f32 = 50.0;
+const ORB_SPEED: f32 = 150.0;
 
 fn setup(
     mut commands: Commands,
@@ -54,24 +54,24 @@ fn keypress_event(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut current_velocity: ResMut<CurrentVelocity>,
 ) {
-    let mut vx = 0.0;
-    let mut vy = 0.0;
+    let mut dx = 0.0;
+    let mut dy = 0.0;
 
     if keyboard.pressed(KeyCode::KeyA) {
-        vx -= 1.0;
+        dx -= 1.0;
     }
     if keyboard.pressed(KeyCode::KeyD) {
-        vx += 1.0;
+        dx += 1.0;
     }
     if keyboard.pressed(KeyCode::KeyW) {
-        vy += 1.0;
+        dy += 1.0;
     }
     if keyboard.pressed(KeyCode::KeyS) {
-        vy -= 1.0;
+        dy -= 1.0;
     }
 
-    current_velocity.0 = if vx != 0.0 || vy != 0.0 {
-        Vec2::new(vx, vy).normalize() * ORB_SPEED
+    current_velocity.0 = if dx != 0.0 || dy != 0.0 {
+        Vec2::new(dx, dy).normalize() * ORB_SPEED
     } else {
         Vec2::new(0.0, 0.0)
     };
