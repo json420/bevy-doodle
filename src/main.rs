@@ -42,7 +42,7 @@ fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>
         let elapsed = time.delta_secs();
         transform.translation.x += velocity.x * elapsed;
         transform.translation.y += velocity.y * elapsed;
-        println!("{elapsed} {:?}", transform.translation);
+        //println!("{elapsed} {:?}", transform.translation);
     }
 }
 
@@ -51,6 +51,27 @@ fn keypress_event(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut avz: ResMut<AngularVelocityZ>,
 ) {
+    let mut vx = 0.0;
+    let mut vy = 0.0;
+
+    if keyboard.pressed(KeyCode::KeyA) {
+        vx -= 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyD) {
+        vx += 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyW) {
+        vy -= 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyS) {
+        vy += 1.0;
+    }
+
+    let v = Vec2::new(vx, vy);
+    if vx != 0.0 || vy != 0.0 {
+        println!("{:?}", v);
+    }
+
     if keyboard.just_pressed(KeyCode::Digit1) {
         println!("1");
         avz.0 = 1.2;
@@ -80,9 +101,6 @@ fn main() {
         }))
         .insert_resource(AngularVelocityZ(0.0))
         .add_systems(Startup, setup)
-        .add_systems(
-            Update,
-            (keypress_event, apply_velocity).chain(),
-        )
+        .add_systems(Update, (keypress_event, apply_velocity).chain())
         .run();
 }
