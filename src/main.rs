@@ -5,8 +5,8 @@ use bevy::{
     window::{PresentMode, WindowPlugin},
 };
 
-const ORB_COLOR: Color = Color::srgb(0.8, 0.1, 0.1);
-const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, -50.0, 2.0);
+const ORB_COLOR: Color = Color::srgb(0.9, 0.1, 0.4);
+const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, 0.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
 const ORB_SPEED: f32 = 150.0;
