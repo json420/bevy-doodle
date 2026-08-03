@@ -10,7 +10,7 @@ const ORB_DIAMETER: f32 = 30.0;
 const ORB_SPEED: f32 = 150.0;
 const ORB_MAX_SPEED: f32 = 300.0;
 const ORB_ACCELERATION: f32 = 150.0;
-const ORB_DRAG: f32 = 100.0;
+const ORB_DRAG_FACTOR: f32 = 2.0;
 
 fn setup(
     mut commands: Commands,
@@ -52,7 +52,6 @@ fn apply_velocity(
         let elapsed = time.delta_secs();
         transform.translation.x += state.velocity.x * elapsed;
         transform.translation.y += state.velocity.y * elapsed;
-        println!("{:?}", state.velocity);
     }
 }
 
@@ -76,8 +75,9 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut stat
     state.acceleration = if dx != 0.0 || dy != 0.0 {
         Vec2::new(dx, dy).normalize() * ORB_ACCELERATION
     } else {
-        Vec2::new(0.0, 0.0)
+        state.velocity * -ORB_DRAG_FACTOR
     };
+    println!("acceleration: {:?}", state.acceleration);
     state.velocity = apply_acceleration(state.acceleration, state.velocity, time.delta_secs());
 }
 
@@ -100,31 +100,18 @@ fn main() {
 }
 
 fn clamp_velocity(velocity: Vec2) -> Vec2 {
-    if velocity.length() > ORB_MAX_SPEED {
+    if velocity.length_squared() < 5.0 {
+        Vec2::new(0.0, 0.0)
+    } else if velocity.length() > ORB_MAX_SPEED {
         velocity.normalize() * ORB_MAX_SPEED
     } else {
         velocity
     }
 }
 
-fn min(a: f32, b: f32) -> f32 {
-    if a < b { a } else { b }
-}
-
-fn compute_drag(velocity: Vec2) -> Vec2 {
-    if velocity == Vec2::new(0.0, 0.0) {
-        Vec2::new(0.0, 0.0)
-    } else {
-        let magnitude = velocity.length();
-        velocity.normalize() * min(magnitude, ORB_DRAG)
-    }
-}
-
 fn apply_acceleration(acceleration: Vec2, velocity: Vec2, elapsed: f32) -> Vec2 {
-    let drag = compute_drag(velocity) * elapsed;
     let delta = acceleration * elapsed;
-    println!("drag: {:?}", drag);
-    clamp_velocity(velocity + delta - drag)
+    clamp_velocity(velocity + delta)
 }
 
 #[cfg(test)]
