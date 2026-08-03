@@ -1,6 +1,4 @@
 use bevy::{
-    camera::visibility::RenderLayers,
-    color::palettes::tailwind,
     prelude::*,
     window::{PresentMode, WindowPlugin},
 };
@@ -30,7 +28,9 @@ fn setup(
 }
 
 #[derive(Resource, Deref, DerefMut)]
-struct CurrentVelocity(Vec2);
+struct State {
+    velocity: Vec2,
+}
 
 #[derive(Component, Deref, DerefMut)]
 struct Velocity(Vec2);
@@ -41,19 +41,16 @@ struct Orb;
 fn apply_velocity(
     mut query: Query<(&mut Transform, &Velocity)>,
     time: Res<Time>,
-    current_velocity: Res<CurrentVelocity>,
+    state: Res<State>,
 ) {
     for (mut transform, mut velocity) in &mut query {
         let elapsed = time.delta_secs();
-        transform.translation.x += current_velocity.x * elapsed;
-        transform.translation.y += current_velocity.y * elapsed;
+        transform.translation.x += state.velocity.x * elapsed;
+        transform.translation.y += state.velocity.y * elapsed;
     }
 }
 
-fn keypress_event(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mut current_velocity: ResMut<CurrentVelocity>,
-) {
+fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, mut state: ResMut<State>) {
     let mut dx = 0.0;
     let mut dy = 0.0;
 
@@ -70,7 +67,7 @@ fn keypress_event(
         dy -= 1.0;
     }
 
-    current_velocity.0 = if dx != 0.0 || dy != 0.0 {
+    state.velocity = if dx != 0.0 || dy != 0.0 {
         Vec2::new(dx, dy).normalize() * ORB_SPEED
     } else {
         Vec2::new(0.0, 0.0)
@@ -86,7 +83,9 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .insert_resource(CurrentVelocity(Vec2::new(0.0, 0.0)))
+        .insert_resource(State {
+            velocity: Vec2::new(0.0, 0.0),
+        })
         .add_systems(Startup, setup)
         .add_systems(Update, (keypress_event, apply_velocity).chain())
         .run();
