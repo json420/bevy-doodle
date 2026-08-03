@@ -8,6 +8,8 @@ const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, 0.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
 const ORB_SPEED: f32 = 150.0;
+const ORB_MAX_SPEED: f32 = 300.0;
+const ORB_ACCELERATION: f32 = 150.0;
 
 fn setup(
     mut commands: Commands,
@@ -29,6 +31,8 @@ fn setup(
 
 #[derive(Resource, Deref, DerefMut)]
 struct State {
+    #[deref]
+    acceleration: Vec2,
     velocity: Vec2,
 }
 
@@ -72,6 +76,12 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, mut state: ResMut<State>)
     } else {
         Vec2::new(0.0, 0.0)
     };
+
+    state.acceleration = if dx != 0.0 || dy != 0.0 {
+        Vec2::new(dx, dy).normalize() * ORB_ACCELERATION
+    } else {
+        Vec2::new(0.0, 0.0)
+    };
 }
 
 fn main() {
@@ -84,9 +94,32 @@ fn main() {
             ..Default::default()
         }))
         .insert_resource(State {
+            acceleration: Vec2::new(0.0, 0.0),
             velocity: Vec2::new(0.0, 0.0),
         })
         .add_systems(Startup, setup)
         .add_systems(Update, (keypress_event, apply_velocity).chain())
         .run();
+}
+
+fn clamp_velocity(velocity: Vec2) -> Vec2 {
+    if velocity.length() > ORB_MAX_SPEED {
+        velocity.normalize() * ORB_MAX_SPEED
+    } else {
+        velocity
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clamp_velocity() {
+        assert_eq!(clamp_velocity(Vec2::new(1.0, 2.0)), Vec2::new(1.0, 2.0));
+        assert_eq!(
+            clamp_velocity(Vec2::new(-ORB_MAX_SPEED, ORB_MAX_SPEED)),
+            Vec2::new(-1.0, 1.0).normalize()
+        );
+    }
 }
