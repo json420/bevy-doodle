@@ -10,6 +10,7 @@ const ORB_DIAMETER: f32 = 30.0;
 const ORB_SPEED: f32 = 150.0;
 const ORB_MAX_SPEED: f32 = 300.0;
 const ORB_ACCELERATION: f32 = 150.0;
+const ORB_DRAG: f32 = 200.0;
 
 fn setup(
     mut commands: Commands,
@@ -71,12 +72,6 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, mut state: ResMut<State>)
         dy -= 1.0;
     }
 
-    state.velocity = if dx != 0.0 || dy != 0.0 {
-        Vec2::new(dx, dy).normalize() * ORB_SPEED
-    } else {
-        Vec2::new(0.0, 0.0)
-    };
-
     state.acceleration = if dx != 0.0 || dy != 0.0 {
         Vec2::new(dx, dy).normalize() * ORB_ACCELERATION
     } else {
@@ -110,6 +105,16 @@ fn clamp_velocity(velocity: Vec2) -> Vec2 {
     }
 }
 
+fn compute_drag(velocity: Vec2) -> Vec2 {
+    velocity.normalize() * -ORB_DRAG
+}
+
+fn apply_acceleration(acceleration: Vec2, velocity: Vec2, elapsed: f32) -> Vec2 {
+    let drag = compute_drag(velocity);
+    let delta = (acceleration + drag) * elapsed;
+    clamp_velocity(velocity + delta)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -119,7 +124,7 @@ mod tests {
         assert_eq!(clamp_velocity(Vec2::new(1.0, 2.0)), Vec2::new(1.0, 2.0));
         assert_eq!(
             clamp_velocity(Vec2::new(-ORB_MAX_SPEED, ORB_MAX_SPEED)),
-            Vec2::new(-1.0, 1.0).normalize()
+            Vec2::new(-1.0, 1.0).normalize() * ORB_MAX_SPEED
         );
     }
 }
