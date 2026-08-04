@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    window::{PresentMode, WindowPlugin},
+    window::{PresentMode, WindowPlugin, WindowResized},
 };
 
 const ORB_COLOR: Color = Color::srgb(0.9, 0.1, 0.4);
@@ -35,6 +35,10 @@ struct State {
     #[deref]
     acceleration: Vec2,
     velocity: Vec2,
+    width: f32,
+    height: f32,
+    bottom_left: Vec2,
+    top_right: Vec2,
 }
 
 #[derive(Component, Deref, DerefMut)]
@@ -52,6 +56,9 @@ fn apply_velocity(
         let elapsed = time.delta_secs();
         transform.translation.x += state.velocity.x * elapsed;
         transform.translation.y += state.velocity.y * elapsed;
+        let v2 = Vec2::new(transform.translation.x, transform.translation.y);
+        println!("translation: {}", v2);
+        transform.translation = v2.clamp(state.bottom_left, state.top_right).extend(2.0);
     }
 }
 
@@ -77,8 +84,19 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut stat
     } else {
         state.velocity * -ORB_DRAG_FACTOR
     };
-    println!("acceleration: {:?}", state.acceleration);
     state.velocity = apply_acceleration(state.acceleration, state.velocity, time.delta_secs());
+}
+
+fn on_resize_system(mut resize_reader: MessageReader<WindowResized>, mut state: ResMut<State>) {
+    for m in resize_reader.read() {
+        println!("resize: {:?}", m);
+        state.width = m.width;
+        state.height = m.height;
+        let x = m.width / 2.0;
+        let y = m.height / 2.0;
+        state.bottom_left = Vec2::new(-x, -y);
+        state.top_right = Vec2::new(x, y);
+    }
 }
 
 fn main() {
@@ -92,10 +110,17 @@ fn main() {
         }))
         .insert_resource(State {
             acceleration: Vec2::new(0.0, 0.0),
-            velocity: Vec2::new(0.0, 0.0),
+            velocity: Vec2::ZERO,
+            width: 0.0,
+            height: 0.0,
+            bottom_left: Vec2::NEG_ONE,
+            top_right: Vec2::ONE,
         })
         .add_systems(Startup, setup)
-        .add_systems(Update, (keypress_event, apply_velocity).chain())
+        .add_systems(
+            Update,
+            (on_resize_system, keypress_event, apply_velocity).chain(),
+        )
         .run();
 }
 
