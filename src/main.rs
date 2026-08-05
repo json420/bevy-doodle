@@ -6,7 +6,8 @@ use bevy::{
 const ORB_COLOR: Color = Color::srgb(0.9, 0.1, 0.4);
 const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, 0.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
-const ORB_DIAMETER: f32 = 30.0;
+const ORB_RADIUS: f32 = 15.0;
+const ORB_DIAMETER: f32 = ORB_RADIUS * 2.0;
 const ORB_SPEED: f32 = 150.0;
 const ORB_MAX_SPEED: f32 = 1200.0;
 const ORB_ACCELERATION: f32 = 500.0;
@@ -94,8 +95,8 @@ fn on_resize_system(mut resize_reader: MessageReader<WindowResized>, mut state: 
         state.height = m.height;
         let x = m.width / 2.0;
         let y = m.height / 2.0;
-        state.bottom_left = Vec2::new(-x, -y);
-        state.top_right = Vec2::new(x, y);
+        state.bottom_left = Vec2::new(-x + ORB_RADIUS, -y + ORB_RADIUS);
+        state.top_right = Vec2::new(x - ORB_RADIUS, y - ORB_RADIUS);
     }
 }
 
