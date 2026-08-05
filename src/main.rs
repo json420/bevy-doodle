@@ -1,6 +1,8 @@
 use bevy::{
     prelude::*,
-    window::{PresentMode, WindowPlugin, WindowResized},
+    window::{
+        PresentMode, PrimaryWindow, VideoModeSelection, WindowMode, WindowPlugin, WindowResized,
+    },
 };
 
 const ORB_COLOR: Color = Color::srgb(0.9, 0.1, 0.4);
@@ -106,6 +108,22 @@ fn on_resize_system(mut resize_reader: MessageReader<WindowResized>, mut state: 
     }
 }
 
+fn toggle_fullscreen(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut window_query: Query<&mut Window, With<PrimaryWindow>>,
+) {
+    if keyboard.just_pressed(KeyCode::F11) {
+        if let Ok(mut window) = window_query.single_mut() {
+            window.mode = match window.mode {
+                WindowMode::Windowed => {
+                    WindowMode::Fullscreen(MonitorSelection::Primary, VideoModeSelection::Current)
+                }
+                _ => WindowMode::Windowed,
+            };
+        }
+    }
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -124,7 +142,13 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (on_resize_system, keypress_event, apply_velocity).chain(),
+            (
+                toggle_fullscreen,
+                on_resize_system,
+                keypress_event,
+                apply_velocity,
+            )
+                .chain(),
         )
         .run();
 }
