@@ -36,8 +36,6 @@ struct State {
     #[deref]
     acceleration: Vec2,
     velocity: Vec2,
-    width: f32,
-    height: f32,
     bottom_left: Vec2,
     top_right: Vec2,
 }
@@ -101,8 +99,6 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut stat
 fn on_resize_system(mut resize_reader: MessageReader<WindowResized>, mut state: ResMut<State>) {
     for m in resize_reader.read() {
         println!("resize: {:?}", m);
-        state.width = m.width;
-        state.height = m.height;
         let x = m.width / 2.0;
         let y = m.height / 2.0;
         state.bottom_left = Vec2::new(-x + ORB_RADIUS, -y + ORB_RADIUS);
@@ -122,8 +118,6 @@ fn main() {
         .insert_resource(State {
             acceleration: Vec2::new(0.0, 0.0),
             velocity: Vec2::ZERO,
-            width: 0.0,
-            height: 0.0,
             bottom_left: Vec2::NEG_ONE,
             top_right: Vec2::ONE,
         })
