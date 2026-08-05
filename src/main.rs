@@ -11,7 +11,7 @@ const ORB_DIAMETER: f32 = ORB_RADIUS * 2.0;
 const ORB_SPEED: f32 = 150.0;
 const ORB_MAX_SPEED: f32 = 1200.0;
 const ORB_ACCELERATION: f32 = 999.0;
-const ORB_DRAG_FACTOR: f32 = 1.25;
+const ORB_DRAG_FACTOR: f32 = 0.9;
 
 fn setup(
     mut commands: Commands,
