@@ -75,16 +75,16 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut stat
     let mut dx = 0.0;
     let mut dy = 0.0;
 
-    if keyboard.pressed(KeyCode::KeyA) {
+    if keyboard.pressed(KeyCode::KeyA) || keyboard.pressed(KeyCode::ArrowLeft) {
         dx -= 1.0;
     }
-    if keyboard.pressed(KeyCode::KeyD) {
+    if keyboard.pressed(KeyCode::KeyD) || keyboard.pressed(KeyCode::ArrowRight) {
         dx += 1.0;
     }
-    if keyboard.pressed(KeyCode::KeyW) {
+    if keyboard.pressed(KeyCode::KeyW) || keyboard.pressed(KeyCode::ArrowUp) {
         dy += 1.0;
     }
-    if keyboard.pressed(KeyCode::KeyS) {
+    if keyboard.pressed(KeyCode::KeyS) || keyboard.pressed(KeyCode::ArrowDown) {
         dy -= 1.0;
     }
 
