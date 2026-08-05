@@ -8,9 +8,9 @@ const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, 0.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
 const ORB_SPEED: f32 = 150.0;
-const ORB_MAX_SPEED: f32 = 300.0;
-const ORB_ACCELERATION: f32 = 150.0;
-const ORB_DRAG_FACTOR: f32 = 2.0;
+const ORB_MAX_SPEED: f32 = 100.0;
+const ORB_ACCELERATION: f32 = 300.0;
+const ORB_DRAG_FACTOR: f32 = 1.25;
 
 fn setup(
     mut commands: Commands,
@@ -82,8 +82,8 @@ fn keypress_event(keyboard: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut stat
     state.acceleration = if dx != 0.0 || dy != 0.0 {
         Vec2::new(dx, dy).normalize() * ORB_ACCELERATION
     } else {
-        state.velocity * -ORB_DRAG_FACTOR
-    };
+        Vec2::ZERO
+    } - state.velocity * ORB_DRAG_FACTOR;
     state.velocity = apply_acceleration(state.acceleration, state.velocity, time.delta_secs());
 }
 
