@@ -51,7 +51,7 @@ struct Orb;
 fn apply_velocity(
     mut query: Query<(&mut Transform, &Velocity)>,
     time: Res<Time>,
-    state: Res<State>,
+    mut state: ResMut<State>,
 ) {
     for (mut transform, mut velocity) in &mut query {
         let elapsed = time.delta_secs();
@@ -59,6 +59,16 @@ fn apply_velocity(
         transform.translation.y += state.velocity.y * elapsed;
         let s = Vec2::new(transform.translation.x, transform.translation.y);
         println!("translation: {}", s);
+        if transform.translation.x < state.bottom_left.x
+            || transform.translation.x > state.top_right.x
+        {
+            state.velocity.x *= -1.0;
+        }
+        if transform.translation.y < state.bottom_left.y
+            || transform.translation.y > state.top_right.y
+        {
+            state.velocity.y *= -1.0;
+        }
         transform.translation = s.clamp(state.bottom_left, state.top_right).extend(2.0);
     }
 }
