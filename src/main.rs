@@ -8,8 +8,8 @@ const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, 0.0, 2.0);
 const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_DIAMETER: f32 = 30.0;
 const ORB_SPEED: f32 = 150.0;
-const ORB_MAX_SPEED: f32 = 100.0;
-const ORB_ACCELERATION: f32 = 300.0;
+const ORB_MAX_SPEED: f32 = 1200.0;
+const ORB_ACCELERATION: f32 = 500.0;
 const ORB_DRAG_FACTOR: f32 = 1.25;
 
 fn setup(
