@@ -10,7 +10,7 @@ const ORB_RADIUS: f32 = 15.0;
 const ORB_DIAMETER: f32 = ORB_RADIUS * 2.0;
 const ORB_SPEED: f32 = 150.0;
 const ORB_MAX_SPEED: f32 = 1200.0;
-const ORB_ACCELERATION: f32 = 500.0;
+const ORB_ACCELERATION: f32 = 999.0;
 const ORB_DRAG_FACTOR: f32 = 1.25;
 
 fn setup(
@@ -57,9 +57,9 @@ fn apply_velocity(
         let elapsed = time.delta_secs();
         transform.translation.x += state.velocity.x * elapsed;
         transform.translation.y += state.velocity.y * elapsed;
-        let v2 = Vec2::new(transform.translation.x, transform.translation.y);
-        println!("translation: {}", v2);
-        transform.translation = v2.clamp(state.bottom_left, state.top_right).extend(2.0);
+        let s = Vec2::new(transform.translation.x, transform.translation.y);
+        println!("translation: {}", s);
+        transform.translation = s.clamp(state.bottom_left, state.top_right).extend(2.0);
     }
 }
 
