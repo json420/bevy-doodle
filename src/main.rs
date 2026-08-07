@@ -29,7 +29,6 @@ fn setup(
         Transform::from_translation(ORB_INITIAL_POSITION)
             .with_scale(Vec2::splat(ORB_DIAMETER).extend(1.0)),
         Orb,
-        Velocity(ORB_INITIAL_VELOCITY),
     ));
 }
 
@@ -42,18 +41,15 @@ struct State {
     top_right: Vec2,
 }
 
-#[derive(Component, Deref, DerefMut)]
-struct Velocity(Vec2);
-
 #[derive(Component)]
 struct Orb;
 
 fn apply_velocity(
-    mut query: Query<(&mut Transform, &Velocity)>,
+    mut query: Query<(&mut Transform, &Orb)>,
     time: Res<Time>,
     mut state: ResMut<State>,
 ) {
-    for (mut transform, mut velocity) in &mut query {
+    for (mut transform, _orb) in &mut query {
         let elapsed = time.delta_secs();
         transform.translation.x += state.velocity.x * elapsed;
         transform.translation.y += state.velocity.y * elapsed;
