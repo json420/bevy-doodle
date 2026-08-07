@@ -13,11 +13,14 @@ const ORB_MAX_SPEED: f32 = 1500.0;
 const ORB_ACCELERATION: f32 = 999.0;
 const ORB_DRAG_FACTOR: f32 = 0.6;
 
+#[derive(Resource, Deref)]
+struct CollisionSound(Handle<AudioSource>);
+
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    _asset_server: Res<AssetServer>,
+    asset_server: Res<AssetServer>,
 ) {
     println!("setup()");
     commands.spawn(Camera2d);
@@ -28,6 +31,15 @@ fn setup(
             .with_scale(Vec2::splat(ORB_DIAMETER).extend(1.0)),
         Orb,
     ));
+    let sound = asset_server.load("sounds/breakout_collision.ogg");
+    commands.insert_resource(CollisionSound(sound));
+}
+
+#[derive(Event)]
+struct OrbCollided;
+
+fn play_sound(_collided: On<OrbCollided>, mut commands: Commands, sound: Res<CollisionSound>) {
+    commands.spawn((AudioPlayer(sound.clone()), PlaybackSettings::DESPAWN));
 }
 
 #[derive(Resource, Deref, DerefMut)]
@@ -46,6 +58,7 @@ fn apply_velocity(
     mut query: Query<(&mut Transform, &Orb)>,
     time: Res<Time>,
     mut state: ResMut<State>,
+    mut commands: Commands,
 ) {
     for (mut transform, _orb) in &mut query {
         let elapsed = time.delta_secs();
@@ -53,17 +66,24 @@ fn apply_velocity(
         transform.translation.y += state.velocity.y * elapsed;
         let s = Vec2::new(transform.translation.x, transform.translation.y);
         println!("translation: {}", s);
+        let mut collided = false;
         if transform.translation.x < state.bottom_left.x
             || transform.translation.x > state.top_right.x
         {
             state.velocity.x *= -1.0;
+            collided = true;
         }
         if transform.translation.y < state.bottom_left.y
             || transform.translation.y > state.top_right.y
         {
             state.velocity.y *= -1.0;
+            collided = true;
         }
         transform.translation = s.clamp(state.bottom_left, state.top_right).extend(2.0);
+        if collided {
+            println!("collided");
+            commands.trigger(OrbCollided);
+        }
     }
 }
 
@@ -144,6 +164,7 @@ fn main() {
             )
                 .chain(),
         )
+        .add_observer(play_sound)
         .run();
 }
 
