@@ -7,19 +7,17 @@ use bevy::{
 
 const ORB_COLOR: Color = Color::srgb(0.9, 0.1, 0.4);
 const ORB_INITIAL_POSITION: Vec3 = Vec3::new(0.0, 0.0, 2.0);
-const ORB_INITIAL_VELOCITY: Vec2 = Vec2::new(25.0, -40.0);
 const ORB_RADIUS: f32 = 15.0;
 const ORB_DIAMETER: f32 = ORB_RADIUS * 2.0;
-const ORB_SPEED: f32 = 150.0;
-const ORB_MAX_SPEED: f32 = 1200.0;
+const ORB_MAX_SPEED: f32 = 1500.0;
 const ORB_ACCELERATION: f32 = 999.0;
-const ORB_DRAG_FACTOR: f32 = 0.9;
+const ORB_DRAG_FACTOR: f32 = 0.6;
 
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>,
 ) {
     println!("setup()");
     commands.spawn(Camera2d);
