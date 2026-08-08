@@ -25,11 +25,11 @@ fn setup(
     println!("setup()");
     commands.spawn(Camera2d);
     commands.spawn((
+        Orb,
         Mesh2d(meshes.add(Circle::default())),
         MeshMaterial2d(materials.add(ORB_COLOR)),
         Transform::from_translation(ORB_INITIAL_POSITION)
             .with_scale(Vec2::splat(ORB_DIAMETER).extend(1.0)),
-        Orb,
     ));
     let sound = asset_server.load("sounds/breakout_collision.ogg");
     commands.insert_resource(CollisionSound(sound));
@@ -55,12 +55,13 @@ struct State {
 struct Orb;
 
 fn apply_velocity(
-    mut query: Query<(&mut Transform, &Orb)>,
+    mut query: Query<(&mut Transform, &mut MeshMaterial2d<ColorMaterial>)>,
     time: Res<Time>,
     mut state: ResMut<State>,
     mut commands: Commands,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    for (mut transform, _orb) in &mut query {
+    for (mut transform, mut material_2d) in &mut query {
         let elapsed = time.delta_secs();
         transform.translation.x += state.velocity.x * elapsed;
         transform.translation.y += state.velocity.y * elapsed;
@@ -83,6 +84,10 @@ fn apply_velocity(
         if collided {
             println!("collided");
             commands.trigger(OrbCollided);
+            if let Some(mut m) = materials.get_mut(&material_2d.0) {
+                m.color = Color::srgb(0.0, 1.0, 0.0);
+                println!("color");
+            }
         }
     }
 }
